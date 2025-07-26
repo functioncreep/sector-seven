@@ -1,4 +1,4 @@
-Journey to Sector 7
+JOURNEY TO SECTOR 7{pg}By Lucy Earle and Chris Lackey{pg}{exitNow "1,6,6"}{jump "6"}
 
 # BITSY VERSION 8.14
 
@@ -1250,6 +1250,16 @@ SPR d
 DLG 0
 POS 1 4,8
 
+SPR e
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+
 ITM 0
 00000000
 00000000
@@ -1384,6 +1394,12 @@ NAME term_dialog_end
 DLG 5
 BOOST PANEL DEACTIVATED.
 NAME boost_dialog_end
+
+DLG 6
+"""
+08:15 - I wake up again. On the ship again. Morning.{pg}{exitNow "1,-1,+2,fade_b"}08:30 - Crap. I'm running out of Disconium for the fuel liner. Think Steve, think.{pg}{exitNow "1,+4,-2,fade_b"}...{pg}{exitNow "1,-2,+3,fade_b"}...{pg}{exitNow "1,-2,-2,fade_b"}...{pg}{exitNow "1,+2,+0,fade_b"}10:30 - I've thought. I know that Sector 7 has the deepest mine of Disconium.{pg}Should I make the dangerous venture across 7 sectors to retrieve it?{pg}10:31 - The only other option is...{pg}...{pg}10:31:59 - Death.
+"""
+NAME intro_dialog
 
 VAR ship_power
 6
