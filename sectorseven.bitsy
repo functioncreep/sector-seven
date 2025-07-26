@@ -1274,6 +1274,74 @@ DLG 1
 
 DLG 0
 """
+Welcome to DISCOLINK's Wormhole Transportation Interface.{pg}Ready to proceed to {clr 1}Sector {say target_sector}{/clr}.{pg}Confirm activation of Wormhole Jump Drive...{choice
+  - {clr 2}Confirm.{/clr}
+    WJD activation confirmed.{jump "9"}
+  - Not yet...
+    WJD activation cancelled.
+}
+"""
+NAME term_dialog
+
+DLG 1
+You found a nice warm cup of tea
+NAME tea dialog
+
+DLG 2
+"""
+SHIP STATUS:
+LOCATION: {clr 1}SECTOR {say current_sector}
+{/clr}POWER: {clr 1}{say ship_power}{/clr}
+{
+  - ship_power >= ship_good ?
+    SYSTEMS: {clr 1}GOOD{/clr}
+  - else ?
+    {
+      - ship_power >= ship_ok ?
+        SYSTEMS: OK{pg}MINOR HULL DAMAGE DETECTED.
+        CAUTION ADVISED.
+      - else ?
+        SYSTEMS: {clr 2}CRITICAL{/clr}{pg}MAJOR HULL DAMAGE DETECTED.
+        SYSTEM FAILURE IMMINENT.
+        REPLENISH POWER AS SOON AS POSSIBLE.
+    }
+}
+"""
+NAME computer_dialog
+
+DLG 3
+"""
+{
+  - ship_power > 1 ?
+    {
+      - spoke_to_boost == false ?
+        ADD POWER CELL?{pg}ACTIVATE THIS PANEL AGAIN TO CONFIRM.{spoke_to_boost = true}
+      - else ?
+        {ship_power = ship_power - 1}{boost_added = boost_added + 1}ADDED POWER CELL TO TRAVERSAL DRIVE.{pg}SHIP POWER LEVEL IS NOW {say ship_power}.{spoke_to_boost = false}
+    }
+  - else ?
+    ERROR: SHIP POWER LEVEL TOO LOW.
+    CANNOT ADD LAST REMAINING FUEL CELL TO TRAVERSAL DRIVE.
+}
+"""
+NAME boost_dialog
+
+DLG 4
+CONGRATULATIONS, YOU HAVE REACHED SECTOR 7. {pg}DEACTIVATING WORMHOLE TRAVERSAL INTERFACE.
+NAME term_dialog_end
+
+DLG 5
+BOOST PANEL DEACTIVATED.
+NAME boost_dialog_end
+
+DLG 6
+"""
+08:15 - I wake up again. On the ship again. Morning.{pg}{exitNow "1,-1,+2,fade_b"}08:30 - Crap. I'm running out of Disconium for the fuel liner. Think Steve, think.{pg}{exitNow "1,+4,-2,fade_b"}...{pg}{exitNow "1,-2,+3,fade_b"}...{pg}{exitNow "1,-2,-2,fade_b"}...{pg}{exitNow "1,+2,+0,fade_b"}10:30 - I've thought. I know that Sector 7 has the deepest mine of Disconium.{pg}Should I make the dangerous venture across 7 sectors to retrieve it?{pg}10:31 - The only other option is...{pg}...{pg}10:31:59 - Death.
+"""
+NAME intro_dialog
+
+DLG 7
+"""
 {
   - spoke_to_term == false ?
     GREETINGS. I AM A WORMHOLE TRANSPORTATION INTERFACE.{pg}IF YOU ARE READY TO PROCEED THROUGH THE WORMHOLE,
@@ -1282,8 +1350,8 @@ DLG 0
     PLUG POWER CELLS INTO THE BOOST PANEL BELOW{spoke_to_term = true}
   - else ?
     {target_sector = current_sector + 1}WORMHOLE TRAVERSAL INITIATED.{pg}CALCULATING COORDINATES...{pg}ADJUSTING PROBABILITY VECTORS...{pg}{
-      - boost_add > 0 ?
-        ADDING BOOST FACTOR OF {say boost_add}...{spoke_to_boost = false}{pg}
+      - boost_added > 0 ?
+        ADDING BOOST FACTOR OF {say boost_added}...{spoke_to_boost = false}{pg}
     }ACTIVATING TRAVERSAL ENGINE.{pg}APPROACHING WORMHOLE IN{pg}3...{pg}2...{pg}1...{pg}...{pg}{rbw}{wvy}ENTERING WORMHOLE{/wvy}{/rbw}{pg}{spoke_to_term = false}{shuffle
       - {move_roll = 1}
       - {move_roll = 2}
@@ -1291,7 +1359,7 @@ DLG 0
       - {move_roll = 4}
       - {move_roll = 5}
       - {move_roll = 6}
-    }{move_roll = move_roll + boost_add}{boost_add = 0}{
+    }{move_roll = move_roll + boost_added}{boost_added = 0}{
       - move_roll >= move_cost ?
         {move_success = true}
       - else ?
@@ -1342,64 +1410,115 @@ DLG 0
     }
 }
 """
-NAME term_dialog
+NAME term_dialog_old
 
-DLG 1
-You found a nice warm cup of tea
-NAME tea dialog
-
-DLG 2
+DLG 8
 """
-SHIP STATUS:
-LOCATION: {clr 1}SECTOR {say current_sector}
-{/clr}POWER: {clr 1}{say ship_power}{/clr}
+Welcome to DISCOLINK's Wormhole Transportation Interface.{pg}Each charted sector of space contains a wormhole leading to the next known sector.
+When close to the nearest wormhole, activate the Wormhole Jump Drive, or 'WJD' from this interface.
+The ship will be automatically propelled into the wormhole, and, if traversal is successful, you should arrive in the next charted sector without harm.{pg}However, risks during this form of inter-sector travel include (but are not limited to):{pg}RISK 1. Losing fuel due to failed traversal:
+
+Wormhole travel is inherently unpredictable. Thanks to DISCOLINK's innovative WJD technology, the average probability of successful wormhole traversal has been greatly increased. However, 100% success probability is still impossible. Thus, if a wormhole jump fails, your ship should be returned safely into the sector from which you entered the wormhole. DISCOLINK is not responsible for any damage to your ship from collision with obstacles, space debris or celestial bodies of any kind. (see RISK #2){pg}RISK 2. Collision damage from obstacles, space debris or celestial bodies:
+
+Upon arrival into any given sector after a successful or unsuccessful jump, your ship's position can only be predicted to within the bounds of that sector. Thus, it is possible your ship may arrive within an area that has a high volume of space debris or other hazard, and/or arrive within the trajectory of an obstacle or celestial body, which could lead to shield damage, lowering the ship's power reserves. Please be mindful of the ship's power levels when attempting travel through any wormhole, as reaching critical power level could result in system failure and loss of life.{spoke_to_term = true}
+"""
+NAME term_intro_dialog
+
+DLG 9
+"""
+Add probability boost factor?
+(WARNING: this will use power from the ship's reserves, reducing overall power level){choice
+  - Add boost
+    {add_boost = true}
+  - No boost
+    {add_boost = false}
+}{jump "10"}
+"""
+NAME term_boost_dialog
+
+DLG 10
+"""
+
+"""
+NAME boost_add_dialog
+
+DLG 10
+"""
 {
-  - ship_power >= ship_good ?
-    SYSTEMS: {clr 1}GOOD{/clr}
-  - else ?
+  - add_boost == true ?
     {
-      - ship_power >= ship_ok ?
-        SYSTEMS: OK{pg}MINOR HULL DAMAGE DETECTED.
-        CAUTION ADVISED.
+      - ship_power > 1 ?
+        {ship_power = ship_power - 1}{boost_added = boost_added + 1}ADDED POWER CELL TO TRAVERSAL DRIVE.{pg}SHIP POWER LEVEL IS NOW {say ship_power}.
       - else ?
-        SYSTEMS: {clr 2}CRITICAL{/clr}{pg}MAJOR HULL DAMAGE DETECTED.
-        SYSTEM FAILURE IMMINENT.
-        REPLENISH POWER AS SOON AS POSSIBLE.
+        ERROR: SHIP POWER LEVEL TOO LOW.
+        CANNOT ADD LAST REMAINING FUEL CELL TO TRAVERSAL DRIVE.
+    }
+  - else ?
+    No probability boost added.
+}{pg}Activating WJD...{pg}...{pg}...Jump Drive activated. Proceeding through wormhole in{pg}3...{pg}2...{pg}1...{pg}...{pg}{rbw}{wvy}ENTERING WORMHOLE{/wvy}{/rbw}{shuffle
+  - {move_roll = 1}
+  - {move_roll = 2}
+  - {move_roll = 3}
+  - {move_roll = 4}
+  - {move_roll = 5}
+  - {move_roll = 6}
+}{move_roll = move_roll + boost_added}{boost_added = 0}{
+  - move_roll >= move_cost ?
+    {move_success = true}
+  - else ?
+    {move_success = false}{target_sector = current_sector}
+}{
+  - target_sector == 1 ?
+    {target_name = "sector_01"}
+  - target_sector == 2 ?
+    {target_name = "sector_02"}
+  - target_sector == 3 ?
+    {target_name = "sector_03"}
+  - target_sector == 4 ?
+    {target_name = "sector_04"}
+  - target_sector == 5 ?
+    {target_name = "sector_05"}
+  - target_sector == 6 ?
+    {target_name = "sector_06"}
+  - target_sector == 7 ?
+    {target_name = "sector_07"}
+}{exit "1,+0,+0,wave"}{jump "11"}
+"""
+NAME term_move_dialog
+
+DLG 11
+"""
+{current_sector = target_sector}TRAVERSAL COMPLETE.{pg}RESULT:{pg}{
+  - move_success == true ?
+    {rbw}{wvy}SUCCESS.{/wvy}{/rbw}
+  - else ?
+    ...{pg}ERROR
+    ERROR
+    {shk}ERROR{/shk}{pg}WORMHOLE TRAVERSAL FAILURE.
+}{
+  - current_sector == 7 ?
+    {rbw}{wvy}YOU MADE IT!{/wvy}{/rbw}
+  - else ?
+    {pg}NAVIGATING SHIP TOWARD NEXT LOCAL WORMHOLE.{pg}{shuffle
+      - {took_damage = false}
+      - {took_damage = true}
+    }{
+      - took_damage == true ?
+        {ship_power = ship_power - 1}{shk}*BOOM!*{/shk}{pg}...{pg}ATTENTION! ATTENTION!
+        HULL DAMAGE DETECTED!{pg}REDIRECTING POWER TO SHIELD.{pg}SHIP POWER LEVEL IS NOW {say ship_power}.
+      - else ?
+        {
+          - ship_power > 0 ?
+            ...{pg}NAVIGATION COMPLETE.
+            SHIP HAS ARRIVED AT LOCAL WORMHOLE FOR THIS SECTOR.
+          - else ?
+            POWER LEVEL IS NOW 0.
+            SHIP SYSTEMS SHUTTING DOWN...{pg}[GAME OVER...]
+        }
     }
 }
 """
-NAME computer_dialog
-
-DLG 3
-"""
-{
-  - ship_power > 1 ?
-    {
-      - spoke_to_boost == false ?
-        ADD POWER CELL?{pg}ACTIVATE THIS PANEL AGAIN TO CONFIRM.{spoke_to_boost = true}
-      - else ?
-        {ship_power = ship_power - 1}{boost_add = boost_add + 1}ADDED POWER CELL TO TRAVERSAL DRIVE.{pg}SHIP POWER LEVEL IS NOW {say ship_power}.{spoke_to_boost = false}
-    }
-  - else ?
-    ERROR: SHIP POWER LEVEL TOO LOW.
-    CANNOT ADD LAST REMAINING FUEL CELL TO TRAVERSAL DRIVE.
-}
-"""
-NAME boost_dialog
-
-DLG 4
-CONGRATULATIONS, YOU HAVE REACHED SECTOR 7. {pg}DEACTIVATING WORMHOLE TRAVERSAL INTERFACE.
-NAME term_dialog_end
-
-DLG 5
-BOOST PANEL DEACTIVATED.
-NAME boost_dialog_end
-
-DLG 6
-"""
-08:15 - I wake up again. On the ship again. Morning.{pg}{exitNow "1,-1,+2,fade_b"}08:30 - Crap. I'm running out of Disconium for the fuel liner. Think Steve, think.{pg}{exitNow "1,+4,-2,fade_b"}...{pg}{exitNow "1,-2,+3,fade_b"}...{pg}{exitNow "1,-2,-2,fade_b"}...{pg}{exitNow "1,+2,+0,fade_b"}10:30 - I've thought. I know that Sector 7 has the deepest mine of Disconium.{pg}Should I make the dangerous venture across 7 sectors to retrieve it?{pg}10:31 - The only other option is...{pg}...{pg}10:31:59 - Death.
-"""
-NAME intro_dialog
+NAME jumped_dialog
 
 VAR ship_power
 6
@@ -1410,13 +1529,19 @@ VAR ship_good
 VAR ship_ok
 3
 
+VAR spoke_to_computer
+false
+
 VAR spoke_to_term
 false
 
 VAR spoke_to_boost
 false
 
-VAR boost_add
+VAR add_boost
+false
+
+VAR boost_added
 0
 
 VAR move_cost
